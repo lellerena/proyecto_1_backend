@@ -1,0 +1,188 @@
+### Variables
+@baseUrl = http://localhost:3000/api
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZG1pbjJAZXhhbXBsZS5jb20iLCJuYW1lIjoiQWRtaW4gVXNlciIsImlhdCI6MTc0NjgzMTAwNywiZXhwIjoxNzQ2OTE3NDA3fQ.W_zKmI336t86zqLLdwoOuiSdAX_vz8rn4tnGxcOrQJg 
+@userToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ1c2VyQGV4YW1wbGUuY29tIiwibmFtZSI6IlJlZ3VsYXIgVXNlciIsImlhdCI6MTc0NjgyOTg5MywiZXhwIjoxNzQ2OTE2MjkzfQ.sEB4XtDPCj40LSETKPhoKnFThbnr4xQWM59YosuTK9U
+
+### 1. Authentication - Register new user
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "name": "Regular User",
+  "password": "password123"
+}
+
+### 2. Authentication - Register admin user
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "admin3@example.com",
+  "name": "Admin User",
+  "password": "admin123"
+}
+
+### 3. Authentication - Login as regular user
+# @name loginUser
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+
+### 4. Authentication - Login as admin user
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin2@example.com",
+  "password": "admin123"
+}
+
+### 5. Users - Get my profile
+GET {{baseUrl}}/users/profile
+Authorization: Bearer {{userToken}}
+
+### 6. Users - Get my reservation history
+GET {{baseUrl}}/users/reservations/history
+Authorization: Bearer {{userToken}}
+
+### 7. Users - Update user profile
+PUT {{baseUrl}}/users/1
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated User Name"
+}
+
+### 8. Users - Update user profile (admin updating another user)
+PUT {{baseUrl}}/users/2
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated By Admin"
+}
+
+### 9. Users - Deactivate user (soft delete)
+DELETE {{baseUrl}}/users/2
+Authorization: Bearer {{adminToken}}
+
+### 10. Books - Create new book (admin only)
+# @name createBook
+POST {{baseUrl}}/books
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "title": "The Great Gatsby",
+  "author": "F. Scott Fitzgerald",
+  "genre": "Classic",
+  "publishedDate": "1925-04-10",
+  "publisher": "Charles Scribner's Sons",
+  "availableCopies": 5
+}
+
+### 11. Books - Create another book (admin only)
+POST {{baseUrl}}/books
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "title": "To Kill a Mockingbird",
+  "author": "Harper Lee",
+  "genre": "Classic",
+  "publishedDate": "1960-07-11",
+  "publisher": "J. B. Lippincott & Co.",
+  "availableCopies": 3
+}
+
+### 12. Books - Get book by ID
+GET {{baseUrl}}/books/1
+
+### 13. Books - Search books with no filters
+GET {{baseUrl}}/books
+
+### 14. Books - Search books by genre
+GET {{baseUrl}}/books?genre=Classic
+
+### 15. Books - Search books by author
+GET {{baseUrl}}/books?author=Harper
+
+### 16. Books - Search books by title
+GET {{baseUrl}}/books?title=Great
+
+### 17. Books - Search books by publisher
+GET {{baseUrl}}/books?publisher=Lippincott
+
+### 18. Books - Search books by published date range
+GET {{baseUrl}}/books?publishedAfter=1950-01-01&publishedBefore=1970-01-01
+
+### 19. Books - Search books by availability
+GET {{baseUrl}}/books?available=true
+
+### 20. Books - Search books with multiple filters
+GET {{baseUrl}}/books?genre=Classic&publishedAfter=1920-01-01&available=true
+
+### 21. Books - Update book (admin only)
+PUT {{baseUrl}}/books/1
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "availableCopies": 10,
+  "genre": "American Literature"
+}
+
+### 22. Books - Deactivate book (soft delete) (admin only)
+DELETE {{baseUrl}}/books/1
+Authorization: Bearer {{adminToken}}
+
+### 23. Reservations - Create a reservation
+POST {{baseUrl}}/reservations
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "bookId": 2,
+  "returnDate": "2023-12-31"
+}
+
+### 24. Reservations - Get active reservations
+GET {{baseUrl}}/reservations/active
+Authorization: Bearer {{userToken}}
+
+### 25. Reservations - Return a book
+POST {{baseUrl}}/reservations/return
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "reservationId": 1
+}
+
+### 26. Advanced - Search books including inactive (admin only)
+GET {{baseUrl}}/books?includeInactive=true
+Authorization: Bearer {{adminToken}}
+
+### 27. Advanced - Create admin permissions (use after creating an admin user)
+# Use this manually after registering the admin and getting their ID
+# This would typically be done via a database migration or admin panel
+# For demo purposes only
+# Replace 2 with the actual admin user ID
+POST {{baseUrl}}/users/2/permissions
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "createBooks": true,
+  "updateBooks": true,
+  "deleteBooks": true,
+  "updateUsers": true,
+  "deleteUsers": true
+}

@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int         @id @default(autoincrement())
+  email          String      @unique
+  name           String
+  password       String
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  isActive       Boolean     @default(true)
+  permissions    Permission[]
+  reservations   Reservation[]
+}
+
+model Book {
+  id              Int         @id @default(autoincrement())
+  title           String
+  author          String
+  genre           String
+  publishedDate   DateTime
+  publisher       String
+  availableCopies Int         @default(1)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  isActive        Boolean     @default(true)
+  reservations    Reservation[]
+}
+
+model Reservation {
+  id           Int       @id @default(autoincrement())
+  userId       Int
+  bookId       Int
+  reservedAt   DateTime  @default(now())
+  returnDate   DateTime
+  returnedAt   DateTime?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  user         User      @relation(fields: [userId], references: [id])
+  book         Book      @relation(fields: [bookId], references: [id])
+}
+
+model Permission {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  createBooks    Boolean  @default(false)
+  updateBooks    Boolean  @default(false)
+  deleteBooks    Boolean  @default(false)
+  updateUsers    Boolean  @default(false)
+  deleteUsers    Boolean  @default(false)
+  
+  user           User     @relation(fields: [userId], references: [id])
+}
